@@ -36,10 +36,10 @@
                 <h4>Login</h4>
               </div>
               <div class="card-body">
-                <form method="POST" autocomplete="off" asp-action="Login" class="needs-validation" novalidate="">
+                <form id="loginForm" asp-controller="Authentication" asp-action="Login" autocomplete="off" class="needs-validation" novalidate="">
                   <div class="form-group">
                     <label for="email">Email</label>
-                    <input id="email" type="email" asp-for="Email" class="form-control" name="email" tabindex="1" required autofocus>
+                    <input id="Email" type="email" asp-for="Email" class="form-control" name="email" tabindex="1" required autofocus>
                     <div class="invalid-feedback">
                       Please fill in your email
                     </div>
@@ -48,15 +48,16 @@
                     <div class="d-block">
                       <label for="password" class="control-label">Password</label>                     
                     </div>
-                    <input id="password" type="password" asp-for="Password" class="form-control" name="password" tabindex="2" required>
+                    <input id="Password" type="password" asp-for="Password" class="form-control" name="password" tabindex="2" required>
                     <div class="invalid-feedback">
                       please fill in your password
                     </div>
                   </div>
                   <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block" tabindex="4">
+                    <button type="submit" onclick="LoginFormSubmit()" class="btn btn-primary btn-lg btn-block" tabindex="4">
                       Login
                     </button>
+                     <div id="msg"><ul style="color:red;"> Invalid Username Or Password</ul></div>
                   </div>
                 </form>
               </div>
@@ -74,6 +75,31 @@
   <script src="~/js/scripts.js"></script>
   <!-- Custom JS File -->
   <script src="~/js/custom.js"></script>
+   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script type="text/javascript">
+        $("#msg").hide();
+        function LoginFormSubmit() {
+            var data = $("#loginForm").serialize();  
+            $.ajax({
+                type: "POST",
+                url: "/Authentication/Login",                
+                data: data,
+                success: function (response) {
+                   if(response == true)
+                   {
+                      window.location.href = "/Home/Index";
+                      $("#msg").hide();                    
+                   }
+                   if(response == false)
+                   {
+                       $("#loginForm")[0].reset();
+                      $("#msg").show();           
+                   }
+                }
+              });
+            }       
+    </script>
+
 </body>
 
 

@@ -17,7 +17,6 @@ namespace Restaurant.Web.Core.Services
         private readonly ILogger<AuthenticationService> _logger;
         private readonly IConfiguration _configuration;
         private readonly IHttpClientService _httpClientService;
-        private readonly Dictionary<string, string> _header = new Dictionary<string, string>();
         public AuthenticationService(IConfiguration configuration, IHttpClientService httpClientService, ILogger<AuthenticationService> logger)
         {
             _logger = logger;
@@ -25,22 +24,22 @@ namespace Restaurant.Web.Core.Services
             _configuration = configuration;
         }
 
-        public async Task<Response<LoginResponse>> Authenticate(LoginRequest loginRequest)
+        public async Task<Response<LoginResponse>> Authenticate(string email, string password)
         {
             try
             {
                 var fullURL = $"{_configuration.GetSection("BaseUrl").Value}api/auth/login";
-                var response = await _httpClientService.MakeHttpCall(_httpClientService.BuildRequest(httpMethod: HttpMethod.Post, uri: fullURL, loginRequest));
+                var response = await _httpClientService.MakeHttpCall(_httpClientService.BuildRequest(httpMethod: HttpMethod.Post, uri: fullURL, new LoginRequest { Email = email, Password = password}));
                 var responseData = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {                    
-                    _logger.LogInformation("Authenticate Response ----> ", $"Logon Successful for {loginRequest.Email} at {DateTime.Now}");
+                    _logger.LogInformation("Authenticate Response ----> ", $"Logon Successful for {email} at {DateTime.Now}");
                     return new Response<LoginResponse> { ResponseCode = (int)response.StatusCode, Message = "Login Successful", Data = JsonConvert.DeserializeObject<LoginResponse>(responseData) };
                 }
-                _logger.LogInformation("Authenticate Response ----> ", $"Logon Failed For {loginRequest.Email} at {DateTime.Now}");
+                _logger.LogInformation("Authenticate Response ----> ", $"Logon Failed For {email} at {DateTime.Now}");
 
                 var respHeaders = response.Headers;
-                return new Response<LoginResponse> { ResponseCode = (int)response.StatusCode, Message = "Login ul"};
+                return new Response<LoginResponse> { ResponseCode = (int)response.StatusCode, Message = responseData};
             }
             catch (Exception ex)
             {
@@ -49,12 +48,5 @@ namespace Restaurant.Web.Core.Services
             }
         }
 
-
-        //private static string ResponseMessage(HttpResponseMessage httpResponseMessage)
-        //{
-        //    Stream receiveStream = httpResponseMessage.GetResponseStream();
-        //    StreamReader readStream = new StreamReader(receiveStream, Encoding.UTF8);
-        //    return readStream.ReadToEnd();
-        //}
     }
 }

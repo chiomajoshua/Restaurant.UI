@@ -10,8 +10,9 @@ namespace Restaurant.Web.Core.Interfaces
         /// <summary>
         /// Logs In User
         /// </summary>
-        /// <param name="loginRequest"></param>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
         /// <returns></returns>
-        Task<Response<LoginResponse>> Authenticate(LoginRequest loginRequest);
+        Task<Response<LoginResponse>> Authenticate(string email, string password);
     }
 }

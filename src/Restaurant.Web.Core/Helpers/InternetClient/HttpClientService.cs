@@ -43,12 +43,14 @@ namespace Restaurant.Web.Core.Helpers.InternetClient
         public HttpRequestMessage BuildRequest(HttpMethod httpMethod, string uri, object content = null, Dictionary<string, string> customHeaders = null)
         {
             var request = new HttpRequestMessage(httpMethod, new Uri(uri));
-            
 
-            if (content != null) request.Content = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json");
-            
-            request.Content.Headers.Clear();
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            if (content != null)
+            {
+                request.Content = new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json");
+                request.Content.Headers.Clear();
+                request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            }
             if (customHeaders != null)
             {
                 foreach (var header in customHeaders)

@@ -5,7 +5,6 @@ using Restaurant.Web.Data.Models.Authentication;
 using System.Collections.Generic;
 using System.Net;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Restaurant.UI.Controllers
 {
@@ -23,27 +22,25 @@ namespace Restaurant.UI.Controllers
 
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginRequest loginRequest)
+        public JsonResult Login(LoginRequest loginRequest)
         {
             if (!ModelState.IsValid)
-                return RedirectToAction(nameof(Login));
+                return Json(false);
 
-            var result = await _authenticationService.Authenticate(loginRequest);
+            var result = _authenticationService.Authenticate(loginRequest.Email, loginRequest.Password).Result;
             if (result.ResponseCode == (int)HttpStatusCode.OK)
             {
-                var claims = new List<Claim>
+                _ = new List<Claim>
                 {
                     new Claim(ClaimTypes.Email, result.Data.Email)
                 };
                 Token = result.Data.Token;
                 HttpContext.Session.SetString("_email", result.Data.Email);
                 HttpContext.Session.SetString("_token", result.Data.Token);
-
-
-                return RedirectToAction("Index", "Home");
+                return Json(true);
             }
-            return RedirectToAction(nameof(Login));
+            ViewBag.ErrorMessage = result.Message;
+            return Json(false);
         }
     }
 }
